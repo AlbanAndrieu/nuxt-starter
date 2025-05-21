@@ -1,0 +1,139 @@
+---
+#  default_language_version:
+#    python: python3.6  # Ubuntu 18.04.3
+#    python: python3.7  # Ubuntu 19.04
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=123"]
+        exclude: >
+          (?x)^(
+              .pnp.cjs|
+              package-lock.json|
+              yarn.lock|
+              npm-shrinkwrap.json|
+              Pipfile.lock|
+              poetry.lock
+              storybook/yarn.lock|
+
+          )$
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+        exclude: >
+          (?x)^(
+              clean.bat|
+              build.bat|
+              mvnw.cmd|
+              .mvn/.*
+          )$
+      - id: check-json
+        exclude: ^.vscode/
+      - id: check-xml
+      - id: check-yaml
+        exclude: >
+          (?x)^(
+              packs/.*|
+              k8s/.*|
+              .gitlab-ci.yml|
+          )$
+      - id: check-symlinks
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: detect-private-key
+        exclude: >
+          (?x)^(
+              roles/jenkins-master/defaults/main.yml|
+              roles/jenkins-master/README.md|
+              ca.key|
+              server.key
+          )$
+      - id: double-quote-string-fixer
+      - id: name-tests-test
+        exclude: >
+          (?x)^(
+              .*/molecule/default/tests/test_default.py
+          )$
+#      - id: no-commit-to-branch
+#        args: [--branch, develop, --branch, master, --branch, release/*]
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
+      - id: requirements-txt-fixer
+      - id: sort-simple-yaml
+      - id: file-contents-sorter
+  - repo: https://github.com/pre-commit/pre-commit.git
+    rev: v4.0.1
+    hooks:
+      - id: validate_manifest
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+      - id: add-trailing-comma
+  - repo: https://github.com/doublify/pre-commit-hindent.git
+    rev: b3680b6ebf9f7cf29b19307f246adef66756feef
+    hooks:
+      - id: hindent
+  - repo: https://github.com/detailyang/pre-commit-shell
+    rev: 1.0.5
+    hooks:
+      - id: shell-lint
+        #entry: pre_commit_hooks/shell-lint.sh -x
+        args: [-x]
+        exclude: >
+          (?x)^(
+              mvnw|
+              hooks|
+          )$
+  - repo: https://github.com/IamTheFij/ansible-pre-commit
+    rev: v0.1.2
+    hooks:
+      - id: encryption-check
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
+    hooks:
+      - id: htmllint
+        args: [--config, .htmlhintrc]
+      - id: markdown-toc
+        args: [--maxdepth, "3", -i]
+      # - id: dockerfile_lint
+      #   args:
+      #     [--permissive, --verbose, --dockerfile, ./Dockerfile]
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.29.4
+    hooks:
+      - id: check-gitlab-ci
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.1-beta
+    hooks:
+      - id: hadolint-docker
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.21.0
+    hooks:
+      - id: gitleaks-docker
+        entry: zricethezav/gitleaks protect --verbose --redact --staged
+  - repo: https://github.com/oxsecurity/megalinter
+    rev: v8.1.0
+    hooks:
+      - id: megalinter-incremental  # Faster, less thorough
+        stages:
+          - commit
+        args:
+          - mega-linter-runner
+          - --containername
+          - "megalinter-incremental"
+          - --remove-container
+          # - --fix
+          # - --env
+          # - "'APPLY_FIXES=all'"
+          - --env
+          - "'CLEAR_REPORT_FOLDER=true'"
+          - --env
+          - "'LOG_LEVEL=warning'"
+          - --filesonly
+          - --flavor
+          - "javascript"
